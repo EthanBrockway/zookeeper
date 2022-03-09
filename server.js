@@ -2,20 +2,12 @@ const fs = require("fs");
 const path = require("path");
 const express = require("express");
 const app = express();
+app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 const PORT = process.env.PORT || 3001;
 const { animals } = require("./data/animals");
-
-app.listen(PORT, () => {
-  console.log(`API server now on port ${PORT}!`);
-});
-
-function findById(id, animalsArray) {
-  const result = animalsArray.filter((animal) => animal.id === id)[0];
-  return result;
-}
 
 function createNewAnimal(body, animalsArray) {
   const animal = body;
@@ -53,6 +45,31 @@ app.post("/api/animals", (req, res) => {
     res.json(animal);
   }
 });
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "/public/index.html"));
+});
+
+app.get("/animals", (req, res) => {
+  res.sendFile(path.join(__dirname, "/public/animals.html"));
+});
+
+app.get("/zookeepers", (req, res) => {
+  res.sendFile(path.join(__dirname, "/public/zookeepers.html"));
+});
+
+app.listen(PORT, () => {
+  console.log(`API server now on port ${PORT}!`);
+});
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "/public/index.html"));
+});
+
+function findById(id, animalsArray) {
+  const result = animalsArray.filter((animal) => animal.id === id)[0];
+  return result;
+}
 
 function validateAnimal(animal) {
   if (!animal.name || typeof animal.name !== "string") {
